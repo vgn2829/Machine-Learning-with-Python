@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIT Kanpur Design and Animation Club</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .video-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Mock data for YouTube videos (replace with actual video IDs)
+        const videoData = {
+            photoshop: [
+                {
+                    id: 'dQw4w9WgXcQ',
+                    title: 'Photoshop Basics: Getting Started',
+                    thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
+                    duration: '15:30'
+                },
+                {
+                    id: 'L_jWHffIx5E',
+                    title: 'Advanced Photo Manipulation Techniques',
+                    thumbnail: 'https://img.youtube.com/vi/L_jWHffIx5E/mqdefault.jpg',
+                    duration: '22:45'
+                },
+                {
+                    id: 'y6120QOlsfU',
+                    title: 'Layer Masking and Blending Modes',
+                    thumbnail: 'https://img.youtube.com/vi/y6120QOlsfU/mqdefault.jpg',
+                    duration: '18:20'
+                },
+                {
+                    id: 'kJQP7kiw5Fk',
+                    title: 'Creating Digital Art in Photoshop',
+                    thumbnail: 'https://img.youtube.com/vi/kJQP7kiw5Fk/mqdefault.jpg',
+                    duration: '25:10'
+                }
+            ],
+            illustrator: [
+                {
+                    id: 'fCeLJmCs_qM',
+                    title: 'Illustrator Fundamentals',
+                    thumbnail: 'https://img.youtube.com/vi/fCeLJmCs_qM/mqdefault.jpg',
+                    duration: '20:15'
+                },
+                {
+                    id: 'Ct6BDNvNFlo',
+                    title: 'Vector Logo Design',
+                    thumbnail: 'https://img.youtube.com/vi/Ct6BDNvNFlo/mqdefault.jpg',
+                    duration: '30:22'
+                },
+                {
+                    id: 'wpAIRGpMsYM',
+                    title: 'Pen Tool Mastery',
+                    thumbnail: 'https://img.youtube.com/vi/wpAIRGpMsYM/mqdefault.jpg',
+                    duration: '16:45'
+                },
+                {
+                    id: 'QbHdpJ8mzJo',
+                    title: 'Typography and Text Effects',
+                    thumbnail: 'https://img.youtube.com/vi/QbHdpJ8mzJo/mqdefault.jpg',
+                    duration: '24:30'
+                }
+            ],
+            digitalPainting: [
+                {
+                    id: 'g3gUNzhDTgc',
+                    title: 'Digital Painting Basics',
+                    thumbnail: 'https://img.youtube.com/vi/g3gUNzhDTgc/mqdefault.jpg',
+                    duration: '28:15'
+                },
+                {
+                    id: 'IhWMzu-pyuU',
+                    title: 'Color Theory for Digital Artists',
+                    thumbnail: 'https://img.youtube.com/vi/IhWMzu-pyuU/mqdefault.jpg',
+                    duration: '19:40'
+                },
+                {
+                    id: 'nxiHBKKH7go',
+                    title: 'Brush Techniques and Custom Brushes',
+                    thumbnail: 'https://img.youtube.com/vi/nxiHBKKH7go/mqdefault.jpg',
+                    duration: '21:55'
+                },
+                {
+                    id: 'Z1PctLyiXSo',
+                    title: 'Character Design Fundamentals',
+                    thumbnail: 'https://img.youtube.com/vi/Z1PctLyiXSo/mqdefault.jpg',
+                    duration: '35:20'
+                }
+            ],
+            afterEffects: [
+                {
+                    id: 'w7stCykSgg0',
+                    title: 'After Effects Introduction',
+                    thumbnail: 'https://img.youtube.com/vi/w7stCykSgg0/mqdefault.jpg',
+                    duration: '26:30'
+                },
+                {
+                    id: 'uFTfWaf4gnE',
+                    title: 'Motion Graphics Essentials',
+                    thumbnail: 'https://img.youtube.com/vi/uFTfWaf4gnE/mqdefault.jpg',
+                    duration: '32:15'
+                },
+                {
+                    id: 'Qnz-RX7xWX4',
+                    title: 'Keyframe Animation Basics',
+                    thumbnail: 'https://img.youtube.com/vi/Qnz-RX7xWX4/mqdefault.jpg',
+                    duration: '23:45'
+                },
+                {
+                    id: 'dH3LoNKUFMs',
+                    title: 'Visual Effects and Compositing',
+                    thumbnail: 'https://img.youtube.com/vi/dH3LoNKUFMs/mqdefault.jpg',
+                    duration: '41:20'
+                }
+            ]
+        };
+
+        // Resources data
+        const resourcesData = {
+            photoshop: [
+                { title: 'Photoshop Shortcuts Cheat Sheet', type: 'PDF', url: '#' },
+                { title: 'Color Theory Guide', type: 'PDF', url: '#' },
+                { title: 'Adobe Photoshop Official Tutorials', type: 'Link', url: 'https://helpx.adobe.com/photoshop/tutorials.html' }
+            ],
+            illustrator: [
+                { title: 'Vector Design Principles', type: 'PDF', url: '#' },
+                { title: 'Typography Guidelines', type: 'PDF', url: '#' },
+                { title: 'Adobe Illustrator User Guide', type: 'Link', url: 'https://helpx.adobe.com/illustrator/user-guide.html' }
+            ],
+            digitalPainting: [
+                { title: 'Digital Art Fundamentals', type: 'PDF', url: '#' },
+                { title: 'Brush Settings Guide', type: 'PDF', url: '#' },
+                { title: 'Concept Art Resources', type: 'Link', url: '#' }
+            ],
+            afterEffects: [
+                { title: 'Animation Principles', type: 'PDF', url: '#' },
+                { title: 'Motion Graphics Templates', type: 'ZIP', url: '#' },
+                { title: 'Adobe After Effects Help', type: 'Link', url: 'https://helpx.adobe.com/after-effects/user-guide.html' }
+            ]
+        };
+
+        // Local Storage Helper Functions
+        const Storage = {
+            getUser: () => JSON.parse(localStorage.getItem('user') || 'null'),
+            setUser: (user) => localStorage.setItem('user', JSON.stringify(user)),
+            removeUser: () => localStorage.removeItem('user'),
+            getProgress: () => JSON.parse(localStorage.getItem('progress') || '{}'),
+            setProgress: (progress) => localStorage.setItem('progress', JSON.stringify(progress)),
+            getWatchedVideos: () => JSON.parse(localStorage.getItem('watchedVideos') || '[]'),
+            setWatchedVideos: (videos) => localStorage.setItem('watchedVideos', JSON.stringify(videos))
+        };
+
+        // Navigation Component
+        const Navigation = ({ currentSection, setCurrentSection, user, onLogin, onLogout }) => {
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+            return (
+                <nav className="bg-white shadow-lg sticky top-0 z-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between h-16">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0 flex items-center">
+                                    <i className="fas fa-palette text-2xl text-purple-600 mr-2"></i>
+                                    <span className="text-xl font-bold text-gray-800">IIT Kanpur DAC</span>
+                                </div>
+                            </div>
+
+                            {/* Desktop Menu */}
+                            <div className="hidden md:flex items-center space-x-8">
+                                <button 
+                                    onClick={() => setCurrentSection('home')}
+                                    className={`px-3 py-2 text-sm font-medium ${currentSection === 'home' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                                >
+                                    Home
+                                </button>
+                                <button 
+                                    onClick={() => setCurrentSection('photoshop')}
+                                    className={`px-3 py-2 text-sm font-medium ${currentSection === 'photoshop' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                                >
+                                    Photoshop
+                                </button>
+                                <button 
+                                    onClick={() => setCurrentSection('illustrator')}
+                                    className={`px-3 py-2 text-sm font-medium ${currentSection === 'illustrator' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                                >
+                                    Illustrator
+                                </button>
+                                <button 
+                                    onClick={() => setCurrentSection('digitalPainting')}
+                                    className={`px-3 py-2 text-sm font-medium ${currentSection === 'digitalPainting' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                                >
+                                    Digital Painting
+                                </button>
+                                <button 
+                                    onClick={() => setCurrentSection('afterEffects')}
+                                    className={`px-3 py-2 text-sm font-medium ${currentSection === 'afterEffects' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                                >
+                                    After Effects
+                                </button>
+                                <button 
+                                    onClick={() => setCurrentSection('resources')}
+                                    className={`px-3 py-2 text-sm font-medium ${currentSection === 'resources' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                                >
+                                    Resources
+                                </button>
+                                {user && (
+                                    <button 
+                                        onClick={() => setCurrentSection('dashboard')}
+                                        className={`px-3 py-2 text-sm font-medium ${currentSection === 'dashboard' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                                    >
+                                        Dashboard
+                                    </button>
+                                )}
+                                <button 
+                                    onClick={() => setCurrentSection('contact')}
+                                    className={`px-3 py-2 text-sm font-medium ${currentSection === 'contact' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                                >
+                                    Contact
+                                </button>
+                                
+                                {user ? (
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-sm text-gray-700">Hi, {user.name}!</span>
+                                        <button 
+                                            onClick={onLogout}
+                                            className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600"
+                                        >
+                                            Logout
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button 
+                                        onClick={onLogin}
+                                        className="bg-purple-600 text-white px-4 py-2 rounded-md text-sm hover:bg-purple-700"
+                                    >
+                                        Login
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Mobile menu button */}
+                            <div className="md:hidden flex items-center">
+                                <button
+                                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                    className="text-gray-700 hover:text-purple-600"
+                                >
+                                    <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'} text-xl`}></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Mobile Menu */}
+                        {isMenuOpen && (
+                            <div className="md:hidden bg-white border-t">
+                                <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                                    <button onClick={() => { setCurrentSection('home'); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 w-full text-left">Home</button>
+                                    <button onClick={() => { setCurrentSection('photoshop'); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 w-full text-left">Photoshop</button>
+                                    <button onClick={() => { setCurrentSection('illustrator'); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 w-full text-left">Illustrator</button>
+                                    <button onClick={() => { setCurrentSection('digitalPainting'); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 w-full text-left">Digital Painting</button>
+                                    <button onClick={() => { setCurrentSection('afterEffects'); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 w-full text-left">After Effects</button>
+                                    <button onClick={() => { setCurrentSection('resources'); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 w-full text-left">Resources</button>
+                                    {user && <button onClick={() => { setCurrentSection('dashboard'); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 w-full text-left">Dashboard</button>}
+                                    <button onClick={() => { setCurrentSection('contact'); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 w-full text-left">Contact</button>
+                                    {user ? (
+                                        <button onClick={() => { onLogout(); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-red-600 hover:text-red-700 w-full text-left">Logout</button>
+                                    ) : (
+                                        <button onClick={() => { onLogin(); setIsMenuOpen(false); }} className="block px-3 py-2 text-base font-medium text-purple-600 hover:text-purple-700 w-full text-left">Login</button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </nav>
+            );
+        };
+
+        // Video Card Component
+        const VideoCard = ({ video, domain, isWatched, onToggleWatched, onPlay }) => {
+            return (
+                <div className="video-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="relative">
+                        <img 
+                            src={video.thumbnail} 
+                            alt={video.title}
+                            className="w-full h-48 object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <button 
+                                onClick={() => onPlay(video)}
+                                className="bg-red-600 text-white rounded-full p-3 hover:bg-red-700"
+                            >
+                                <i className="fas fa-play text-xl"></i>
+                            </button>
+                        </div>
+                        <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                            {video.duration}
+                        </div>
+                    </div>
+                    <div className="p-4">
+                        <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{video.title}</h3>
+                        <div className="flex items-center justify-between">
+                            <button
+                                onClick={() => onToggleWatched(video.id, domain)}
+                                className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+                                    isWatched 
+                                        ? 'bg-green-100 text-green-700 border border-green-300' 
+                                        : 'bg-gray-100 text-gray-700 border border-gray-300'
+                                }`}
+                            >
+                                <i className={`fas ${isWatched ? 'fa-check-circle' : 'fa-circle'}`}></i>
+                                <span>{isWatched ? 'Watched' : 'Mark as Watched'}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Progress Bar Component
+        const ProgressBar = ({ percentage, color = 'purple' }) => {
+            return (
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                        className={`progress-bar bg-${color}-600 h-3 rounded-full`}
+                        style={{ width: `${percentage}%` }}
+                    ></div>
+                </div>
+            );
+        };
+
+        // Search Component
+        const SearchBar = ({ searchTerm, setSearchTerm, onSearch }) => {
+            return (
+                <div className="relative max-w-md mx-auto mb-8">
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && onSearch()}
+                        placeholder="Search videos across all domains..."
+                        className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <button
+                        onClick={onSearch}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-purple-600 text-white px-4 py-1 rounded-md hover:bg-purple-700"
+                    >
+                        Search
+                    </button>
+                </div>
+            );
+        };
+
+        // Login Modal Component
+        const LoginModal = ({ isOpen, onClose, onLogin }) => {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [name, setName] = useState('');
+            const [isSignup, setIsSignup] = useState(false);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (isSignup && name.trim() === '') {
+                    alert('Please enter your name');
+                    return;
+                }
+                if (email.trim() === '' || password.trim() === '') {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                // Mock authentication
+                const userData = {
+                    id: uuid.v4(),
+                    email,
+                    name: isSignup ? name : email.split('@')[0],
+                    loginTime: new Date().toISOString()
+                };
+
+                onLogin(userData);
+                setEmail('');
+                setPassword('');
+                setName('');
+                onClose();
+            };
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-gray-800">
+                                {isSignup ? 'Sign Up' : 'Login'}
+                            </h2>
+                            <button 
+                                onClick={onClose}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <i className="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            {isSignup && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        placeholder="Enter your name"
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder="Enter your email"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder="Enter your password"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition duration-200"
+                            >
+                                {isSignup ? 'Sign Up' : 'Login'}
+                            </button>
+                        </form>
+
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={() => setIsSignup(!isSignup)}
+                                className="text-purple-600 hover:text-purple-700 text-sm"
+                            >
+                                {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign up"}
+                            </button>
+                        </div>
+
+                        <div className="mt-6 border-t pt-4">
+                            <button 
+                                onClick={() => {
+                                    // Mock Google OAuth
+                                    const userData = {
+                                        id: uuid.v4(),
+                                        email: 'user@iitk.ac.in',
+                                        name: 'Student',
+                                        loginTime: new Date().toISOString()
+                                    };
+                                    onLogin(userData);
+                                    onClose();
+                                }}
+                                className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-200 flex items-center justify-center"
+                            >
+                                <i className="fab fa-google mr-2"></i>
+                                Continue with Google
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Video Player Modal Component
+        const VideoPlayer = ({ video, isOpen, onClose }) => {
+            if (!isOpen || !video) return null;
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+                        <div className="flex justify-between items-center p-4 border-b">
+                            <h3 className="text-lg font-semibold text-gray-800">{video.title}</h3>
+                            <button 
+                                onClick={onClose}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <i className="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div className="aspect-video">
+                            <iframe
+                                width="100%"
+                                height="100%"
+                                src={`https://www.youtube.com/embed/${video.id}`}
+                                title={video.title}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            ></iframe>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Home Page Component
+        const HomePage = ({ setCurrentSection }) => {
+            const domains = [
+                {
+                    name: 'Photoshop',
+                    key: 'photoshop',
+                    icon: 'fas fa-paint-brush',
+                    description: 'Master photo editing, digital art, and image manipulation techniques',
+                    color: 'blue'
+                },
+                {
+                    name: 'Illustrator',
+                    key: 'illustrator',
+                    icon: 'fas fa-vector-square',
+                    description: 'Learn vector graphics, logo design, and illustration fundamentals',
+                    color: 'orange'
+                },
+                {
+                    name: 'Digital Painting',
+                    key: 'digitalPainting',
+                    icon: 'fas fa-palette',
+                    description: 'Explore digital art techniques, color theory, and creative expression',
+                    color: 'pink'
+                },
+                {
+                    name: 'After Effects',
+                    key: 'afterEffects',
+                    icon: 'fas fa-film',
+                    description: 'Create stunning motion graphics, animations, and visual effects',
+                    color: 'purple'
+                }
+            ];
+
+            return (
+                <div>
+                    {/* Hero Section */}
+                    <section className="gradient-bg text-white py-20">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+                                IIT Kanpur Design & Animation Club
+                            </h1>
+                            <p className="text-xl md:text-2xl mb-8 text-gray-100">
+                                Unleash your creativity through comprehensive learning in design and animation
+                            </p>
+                            <button 
+                                onClick={() => setCurrentSection('photoshop')}
+                                className="bg-white text-purple-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition duration-200"
+                            >
+                                Start Learning Today
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* Domains Section */}
+                    <section className="py-16 bg-gray-50">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center mb-12">
+                                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                                    Explore Our Learning Domains
+                                </h2>
+                                <p className="text-lg text-gray-600">
+                                    Choose from our curated learning paths designed to take you from beginner to expert
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                {domains.map((domain) => (
+                                    <div 
+                                        key={domain.key}
+                                        onClick={() => setCurrentSection(domain.key)}
+                                        className="bg-white rounded-lg shadow-lg p-6 cursor-pointer transform hover:scale-105 transition duration-200"
+                                    >
+                                        <div className={`text-${domain.color}-600 text-4xl mb-4 text-center`}>
+                                            <i className={domain.icon}></i>
+                                        </div>
+                                        <h3 className="text-xl font-semibold text-gray-800 mb-3 text-center">
+                                            {domain.name}
+                                        </h3>
+                                        <p className="text-gray-600 text-center text-sm">
+                                            {domain.description}
+                                        </p>
+                                        <div className="mt-4 text-center">
+                                            <span className={`text-${domain.color}-600 text-sm font-medium`}>
+                                                Learn More →
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Features Section */}
+                    <section className="py-16 bg-white">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center mb-12">
+                                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                                    Why Choose Our Platform?
+                                </h2>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <div className="text-center">
+                                    <div className="text-purple-600 text-4xl mb-4">
+                                        <i className="fas fa-video"></i>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                                        Curated Video Content
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        Hand-picked YouTube tutorials and playlists for structured learning
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-purple-600 text-4xl mb-4">
+                                        <i className="fas fa-chart-line"></i>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                                        Progress Tracking
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        Monitor your learning journey with detailed progress analytics
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-purple-600 text-4xl mb-4">
+                                        <i className="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                                        Mobile Responsive
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        Learn on any device with our fully responsive design
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        // Learning Section Component
+        const LearningSection = ({ domain, videos, watchedVideos, onToggleWatched, onPlayVideo }) => {
+            const domainTitles = {
+                photoshop: 'Adobe Photoshop',
+                illustrator: 'Adobe Illustrator',
+                digitalPainting: 'Digital Painting',
+                afterEffects: 'Adobe After Effects'
+            };
+
+            const domainDescriptions = {
+                photoshop: 'Master the art of photo editing, digital compositing, and graphic design with Adobe Photoshop.',
+                illustrator: 'Create stunning vector graphics, logos, and illustrations with Adobe Illustrator.',
+                digitalPainting: 'Explore digital art techniques, brush work, and creative expression in digital painting.',
+                afterEffects: 'Bring your designs to life with motion graphics, visual effects, and animation.'
+            };
+
+            const watchedCount = videos.filter(video => watchedVideos.includes(video.id)).length;
+            const progressPercentage = (watchedCount / videos.length) * 100;
+
+            return (
+                <div className="py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                                {domainTitles[domain]}
+                            </h1>
+                            <p className="text-lg text-gray-600 mb-6">
+                                {domainDescriptions[domain]}
+                            </p>
+                            
+                            <div className="max-w-md mx-auto">
+                                <div className="flex justify-between text-sm text-gray-600 mb-2">
+                                    <span>Progress: {watchedCount}/{videos.length} videos</span>
+                                    <span>{Math.round(progressPercentage)}%</span>
+                                </div>
+                                <ProgressBar percentage={progressPercentage} />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {videos.map((video) => (
+                                <VideoCard
+                                    key={video.id}
+                                    video={video}
+                                    domain={domain}
+                                    isWatched={watchedVideos.includes(video.id)}
+                                    onToggleWatched={onToggleWatched}
+                                    onPlay={onPlayVideo}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Dashboard Component
+        const Dashboard = ({ user, watchedVideos }) => {
+            const calculateDomainProgress = (domain) => {
+                const domainVideos = videoData[domain];
+                const watchedCount = domainVideos.filter(video => watchedVideos.includes(video.id)).length;
+                return {
+                    watched: watchedCount,
+                    total: domainVideos.length,
+                    percentage: (watchedCount / domainVideos.length) * 100
+                };
+            };
+
+            const domains = ['photoshop', 'illustrator', 'digitalPainting', 'afterEffects'];
+            const domainNames = {
+                photoshop: 'Photoshop',
+                illustrator: 'Illustrator',
+                digitalPainting: 'Digital Painting',
+                afterEffects: 'After Effects'
+            };
+
+            const overallProgress = domains.reduce((acc, domain) => {
+                const progress = calculateDomainProgress(domain);
+                return {
+                    watched: acc.watched + progress.watched,
+                    total: acc.total + progress.total
+                };
+            }, { watched: 0, total: 0 });
+
+            const overallPercentage = (overallProgress.watched / overallProgress.total) * 100;
+
+            return (
+                <div className="py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                                Learning Dashboard
+                            </h1>
+                            <p className="text-lg text-gray-600">
+                                Welcome back, {user.name}! Track your progress across all domains.
+                            </p>
+                        </div>
+
+                        {/* Overall Progress */}
+                        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+                            <h2 className="text-2xl font-bold text-gray-800 mb-4">Overall Progress</h2>
+                            <div className="flex justify-between text-sm text-gray-600 mb-2">
+                                <span>Total Progress: {overallProgress.watched}/{overallProgress.total} videos</span>
+                                <span>{Math.round(overallPercentage)}%</span>
+                            </div>
+                            <ProgressBar percentage={overallPercentage} />
+                        </div>
+
+                        {/* Domain Progress */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {domains.map((domain) => {
+                                const progress = calculateDomainProgress(domain);
+                                return (
+                                    <div key={domain} className="bg-white rounded-lg shadow-lg p-6">
+                                        <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                                            {domainNames[domain]}
+                                        </h3>
+                                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                                            <span>{progress.watched}/{progress.total} videos completed</span>
+                                            <span>{Math.round(progress.percentage)}%</span>
+                                        </div>
+                                        <ProgressBar percentage={progress.percentage} />
+                                        <div className="mt-4">
+                                            {progress.percentage === 100 ? (
+                                                <span className="text-green-600 text-sm font-medium">
+                                                    <i className="fas fa-check-circle mr-1"></i>
+                                                    Domain Completed!
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-600 text-sm">
+                                                    {progress.total - progress.watched} videos remaining
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Recent Activity */}
+                        <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
+                            <h2 className="text-2xl font-bold text-gray-800 mb-4">Learning Stats</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                                <div>
+                                    <div className="text-3xl font-bold text-purple-600 mb-2">
+                                        {overallProgress.watched}
+                                    </div>
+                                    <div className="text-gray-600">Videos Watched</div>
+                                </div>
+                                <div>
+                                    <div className="text-3xl font-bold text-blue-600 mb-2">
+                                        {domains.filter(domain => calculateDomainProgress(domain).percentage === 100).length}
+                                    </div>
+                                    <div className="text-gray-600">Domains Completed</div>
+                                </div>
+                                <div>
+                                    <div className="text-3xl font-bold text-green-600 mb-2">
+                                        {Math.round(overallPercentage)}%
+                                    </div>
+                                    <div className="text-gray-600">Overall Progress</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Resources Component
+        const ResourcesSection = () => {
+            const domainNames = {
+                photoshop: 'Photoshop',
+                illustrator: 'Illustrator',
+                digitalPainting: 'Digital Painting',
+                afterEffects: 'After Effects'
+            };
+
+            return (
+                <div className="py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                                Learning Resources
+                            </h1>
+                            <p className="text-lg text-gray-600">
+                                Downloadable guides, templates, and external links to enhance your learning
+                            </p>
+                        </div>
+
+                        <div className="space-y-12">
+                            {Object.keys(resourcesData).map((domain) => (
+                                <div key={domain} className="bg-white rounded-lg shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                                        {domainNames[domain]} Resources
+                                    </h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {resourcesData[domain].map((resource, index) => (
+                                            <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-200">
+                                                <div className="flex items-center mb-2">
+                                                    <div className="text-purple-600 mr-3">
+                                                        {resource.type === 'PDF' && <i className="fas fa-file-pdf"></i>}
+                                                        {resource.type === 'Link' && <i className="fas fa-external-link-alt"></i>}
+                                                        {resource.type === 'ZIP' && <i className="fas fa-file-archive"></i>}
+                                                    </div>
+                                                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                                        {resource.type}
+                                                    </span>
+                                                </div>
+                                                <h3 className="font-semibold text-gray-800 mb-2">
+                                                    {resource.title}
+                                                </h3>
+                                                <button 
+                                                    onClick={() => window.open(resource.url, '_blank')}
+                                                    className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                                                >
+                                                    {resource.type === 'Link' ? 'Visit Link' : 'Download'} →
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Contact Component
+        const ContactSection = () => {
+            const [formData, setFormData] = useState({
+                name: '',
+                email: '',
+                subject: '',
+                message: ''
+            });
+
+            const handleSubmit = () => {
+                if (!formData.name || !formData.email || !formData.message) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                // Mock form submission
+                alert('Thank you for your message! We will get back to you soon.');
+                setFormData({ name: '', email: '', subject: '', message: '' });
+            };
+
+            return (
+                <div className="py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                                Contact Us
+                            </h1>
+                            <p className="text-lg text-gray-600">
+                                Have questions? We'd love to hear from you. Send us a message!
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                            {/* Contact Form */}
+                            <div className="bg-white rounded-lg shadow-lg p-8">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Send us a Message</h2>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="Your name"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Email *
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="your.email@example.com"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Subject
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.subject}
+                                            onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="What is this about?"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Message *
+                                        </label>
+                                        <textarea
+                                            value={formData.message}
+                                            onChange={(e) => setFormData({...formData, message: e.target.value})}
+                                            rows="5"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="Your message..."
+                                        ></textarea>
+                                    </div>
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition duration-200"
+                                    >
+                                        Send Message
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Contact Info */}
+                            <div className="space-y-8">
+                                <div className="bg-white rounded-lg shadow-lg p-8">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Get in Touch</h2>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center">
+                                            <div className="text-purple-600 mr-4">
+                                                <i className="fas fa-map-marker-alt text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-semibold text-gray-800">Address</h3>
+                                                <p className="text-gray-600">IIT Kanpur, Uttar Pradesh, India</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <div className="text-purple-600 mr-4">
+                                                <i className="fas fa-envelope text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-semibold text-gray-800">Email</h3>
+                                                <p className="text-gray-600">designclub@iitk.ac.in</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <div className="text-purple-600 mr-4">
+                                                <i className="fas fa-users text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-semibold text-gray-800">Club Hours</h3>
+                                                <p className="text-gray-600">Mon-Fri: 6:00 PM - 9:00 PM</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-lg shadow-lg p-8">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Follow Us</h2>
+                                    <div className="flex space-x-4">
+                                        <a href="#" className="text-purple-600 hover:text-purple-700 text-2xl">
+                                            <i className="fab fa-facebook"></i>
+                                        </a>
+                                        <a href="#" className="text-purple-600 hover:text-purple-700 text-2xl">
+                                            <i className="fab fa-instagram"></i>
+                                        </a>
+                                        <a href="#" className="text-purple-600 hover:text-purple-700 text-2xl">
+                                            <i className="fab fa-youtube"></i>
+                                        </a>
+                                        <a href="#" className="text-purple-600 hover:text-purple-700 text-2xl">
+                                            <i className="fab fa-linkedin"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Search Results Component
+        const SearchResults = ({ searchTerm, searchResults, onToggleWatched, onPlayVideo, watchedVideos }) => {
+            return (
+                <div className="py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-8">
+                            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                                Search Results
+                            </h1>
+                            <p className="text-lg text-gray-600">
+                                Found {searchResults.length} results for "{searchTerm}"
+                            </p>
+                        </div>
+
+                        {searchResults.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {searchResults.map((result) => (
+                                    <VideoCard
+                                        key={`${result.domain}-${result.video.id}`}
+                                        video={result.video}
+                                        domain={result.domain}
+                                        isWatched={watchedVideos.includes(result.video.id)}
+                                        onToggleWatched={onToggleWatched}
+                                        onPlay={onPlayVideo}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12">
+                                <i className="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                                <h3 className="text-xl text-gray-600 mb-2">No results found</h3>
+                                <p className="text-gray-500">Try searching with different keywords</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            const [currentSection, setCurrentSection] = useState('home');
+            const [user, setUser] = useState(Storage.getUser());
+            const [watchedVideos, setWatchedVideos] = useState(Storage.getWatchedVideos());
+            const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+            const [currentVideo, setCurrentVideo] = useState(null);
+            const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [searchResults, setSearchResults] = useState([]);
+
+            const handleLogin = (userData) => {
+                setUser(userData);
+                Storage.setUser(userData);
+                setIsLoginModalOpen(false);
+            };
+
+            const handleLogout = () => {
+                setUser(null);
+                Storage.removeUser();
+                setCurrentSection('home');
+            };
+
+            const handleToggleWatched = (videoId, domain) => {
+                if (!user) {
+                    setIsLoginModalOpen(true);
+                    return;
+                }
+
+                const newWatchedVideos = watchedVideos.includes(videoId)
+                    ? watchedVideos.filter(id => id !== videoId)
+                    : [...watchedVideos, videoId];
+                
+                setWatchedVideos(newWatchedVideos);
+                Storage.setWatchedVideos(newWatchedVideos);
+            };
+
+            const handlePlayVideo = (video) => {
+                setCurrentVideo(video);
+                setIsVideoPlayerOpen(true);
+            };
+
+            const handleSearch = () => {
+                if (!searchTerm.trim()) return;
+
+                const results = [];
+                Object.keys(videoData).forEach(domain => {
+                    videoData[domain].forEach(video => {
+                        if (video.title.toLowerCase().includes(searchTerm.toLowerCase())) {
+                            results.push({ domain, video });
+                        }
+                    });
+                });
+
+                setSearchResults(results);
+                setCurrentSection('search');
+            };
+
+            const renderContent = () => {
+                switch (currentSection) {
+                    case 'home':
+                        return <HomePage setCurrentSection={setCurrentSection} />;
+                    case 'photoshop':
+                    case 'illustrator':
+                    case 'digitalPainting':
+                    case 'afterEffects':
+                        return (
+                            <LearningSection 
+                                domain={currentSection}
+                                videos={videoData[currentSection]}
+                                watchedVideos={watchedVideos}
+                                onToggleWatched={handleToggleWatched}
+                                onPlayVideo={handlePlayVideo}
+                            />
+                        );
+                    case 'dashboard':
+                        return user ? (
+                            <Dashboard user={user} watchedVideos={watchedVideos} />
+                        ) : (
+                            <div className="text-center py-12">
+                                <p className="text-lg text-gray-600 mb-4">Please login to view your dashboard</p>
+                                <button 
+                                    onClick={() => setIsLoginModalOpen(true)}
+                                    className="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700"
+                                >
+                                    Login
+                                </button>
+                            </div>
+                        );
+                    case 'resources':
+                        return <ResourcesSection />;
+                    case 'contact':
+                        return <ContactSection />;
+                    case 'search':
+                        return (
+                            <SearchResults 
+                                searchTerm={searchTerm}
+                                searchResults={searchResults}
+                                onToggleWatched={handleToggleWatched}
+                                onPlayVideo={handlePlayVideo}
+                                watchedVideos={watchedVideos}
+                            />
+                        );
+                    default:
+                        return <HomePage setCurrentSection={setCurrentSection} />;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    <Navigation 
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        user={user}
+                        onLogin={() => setIsLoginModalOpen(true)}
+                        onLogout={handleLogout}
+                    />
+
+                    {currentSection !== 'home' && currentSection !== 'search' && (
+                        <div className="bg-white shadow-sm py-4">
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <SearchBar 
+                                    searchTerm={searchTerm}
+                                    setSearchTerm={setSearchTerm}
+                                    onSearch={handleSearch}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {renderContent()}
+
+                    <LoginModal 
+                        isOpen={isLoginModalOpen}
+                        onClose={() => setIsLoginModalOpen(false)}
+                        onLogin={handleLogin}
+                    />
+
+                    <VideoPlayer 
+                        video={currentVideo}
+                        isOpen={isVideoPlayerOpen}
+                        onClose={() => setIsVideoPlayerOpen(false)}
+                    />
+
+                    {/* Footer */}
+                    <footer className="bg-gray-800 text-white py-8">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                            <p className="text-gray-300">
+                                © 2024 IIT Kanpur Design and Animation Club. All rights reserved.
+                            </p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
